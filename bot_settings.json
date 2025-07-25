@@ -1,0 +1,28 @@
+{
+  "teams": {
+    "team1": "TeamEdge",
+    "team2": "Astralis",
+    "🇺🇦": "team1",
+    "Team": "team1",
+    "Edge": "team2"
+  },
+  "coefficients": {
+    "team1": 1.18,
+    "team2": 3.77
+  },
+  "exchange_rates": {
+    "USD": 41.76,
+    "EUR": 49.09,
+    "UAH": 1.0,
+    "BTC": 4526731.0,
+    "ETH": 152462.0
+  },
+  "max_bet_uah": 100000,
+  "min_bet_uah": 10,
+  "max_balance_uah": 500000,
+  "max_deposit_uah": 10000,
+  "team_emojis": {
+    "team1": "🇺🇦",
+    "team2": "🇩🇰"
+  }
+}

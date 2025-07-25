@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS2 Betting</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--tg-theme-bg-color, #1a1a1a);
+            color: var(--tg-theme-text-color, #ffffff);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-container {
+            margin-bottom: 15px;
+        }
+
+        .logo-text {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4CAF50;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .logo-text .white {
+            color: #ffffff;
+        }
+
+        .balance-card {
+            background: var(--tg-theme-secondary-bg-color, #2a2a2a);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .balance-amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+
+        .balance-label {
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        .deposit-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .deposit-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--tg-theme-bg-color, #1a1a1a);
+            border-radius: 20px;
+            padding: 0;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .modal-close {
+            font-size: 28px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            opacity: 0.9;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: var(--tg-theme-secondary-bg-color, #2a2a2a);
+            color: var(--tg-theme-text-color, #ffffff);
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .quick-deposit-amounts {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quick-amount-btn {
+            background: var(--tg-theme-secondary-bg-color, #2a2a2a);
+            color: var(--tg-theme-text-color, #ffffff);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-amount-btn:hover {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .deposit-info {
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .deposit-info p {
+            margin: 0 0 10px 0;
+            font-weight: bold;
+        }
+
+        .deposit-info ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .deposit-info li {
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .deposit-submit-btn {
+            width: 100%;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .deposit-submit-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .deposit-submit-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .teams-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        .teams-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .team-card {
+            background: var(--tg-theme-secondary-bg-color, #2a2a2a);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--tg-theme-button-color, #4CAF50);
+        }
+
+        .team-card.selected {
+            border-color: var(--tg-theme-button-color, #4CAF50);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .team-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .team-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .team-coef {
+            font-size: 20px;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .currency-section {
+            margin-bottom: 30px;
+        }
+
+        .currency-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .currency-btn {
+            background: var(--tg-theme-secondary-bg-color, #2a2a2a);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--tg-theme-text-color, #ffffff);
+        }
+
+        .currency-btn:hover {
+            border-color: var(--tg-theme-button-color, #4CAF50);
+        }
+
+        .currency-btn.selected {
+            border-color: var(--tg-theme-button-color, #4CAF50);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .currency-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .currency-name {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .amount-section {
+            margin-bottom: 30px;
+        }
+
+        .amount-input {
+            width: 100%;
+            background: var(--tg-theme-secondary-bg-color, #2a2a2a);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 18px;
+            text-align: center;
+            color: var(--tg-theme-text-color, #ffffff);
+            margin-bottom: 15px;
+        }
+
+        .amount-input:focus {
+            outline: none;
+            border-color: var(--tg-theme-button-color, #4CAF50);
+        }
+
+        .quick-amounts {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .quick-amount {
+            background: var(--tg-theme-secondary-bg-color, #2a2a2a);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .quick-amount:hover {
+            border-color: var(--tg-theme-button-color, #4CAF50);
+        }
+
+        .bet-summary {
+            background: var(--tg-theme-secondary-bg-color, #2a2a2a);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+        }
+
+        .place-bet-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #4CAF50, #66BB6A);
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .place-bet-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
+        }
+
+        .place-bet-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+
+        .notification.error {
+            background: #f44336;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100%);
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            opacity: 0.7;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--tg-theme-button-color, #4CAF50);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Celebration styles */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: confetti-fall 3s linear infinite;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .win-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #4CAF50, #66BB6A);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 1001;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: win-popup 0.5s ease-out;
+        }
+
+        @keyframes win-popup {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .lose-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #f44336, #e53935);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            z-index: 1001;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: lose-popup 0.5s ease-out;
+        }
+
+        @keyframes lose-popup {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <div class="logo-text">shml<span class="white">.bet</span></div>
+            </div>
+            <p>Ставки на турнир</p>
+        </div>
+
+        <div class="balance-card">
+            <div class="balance-amount" id="balance">0.00</div>
+            <div class="balance-label">UAH</div>
+            <button class="deposit-btn" onclick="showDepositForm()">➕ Пополнить баланс</button>
+        </div>
+
+        <div class="teams-section">
+            <div class="section-title">Выберите команду</div>
+            <div class="teams-grid" id="teamsGrid">
+                <!-- Teams will be dynamically loaded -->
+            </div>
+        </div>
+
+        <div class="currency-section">
+            <div class="section-title">Выберите валюту</div>
+            <div class="currency-grid" id="currencyGrid">
+                <!-- Currencies will be dynamically loaded -->
+            </div>
+        </div>
+
+        <div class="amount-section">
+            <div class="section-title">Сумма ставки</div>
+            <input type="number" class="amount-input" id="betAmount" placeholder="Введите сумму" step="0.01">
+            <div class="quick-amounts" id="quickAmounts">
+                <!-- Dynamically populated based on currency -->
+            </div>
+        </div>
+
+        <div class="bet-summary hidden" id="betSummary">
+            <div class="summary-row">
+                <span>Команда:</span>
+                <span id="summaryTeam">-</span>
+            </div>
+            <div class="summary-row">
+                <span>Ставка:</span>
+                <span id="summaryAmount">-</span>
+            </div>
+            <div class="summary-row">
+                <span>Коэффициент:</span>
+                <span id="summaryCoef">-</span>
+            </div>
+            <div class="summary-row">
+                <span>Потенциальный выигрыш:</span>
+                <span id="summaryWin">-</span>
+            </div>
+        </div>
+
+        <button class="place-bet-btn" id="placeBetBtn" disabled>
+            🎯 СДЕЛАТЬ СТАВКУ
+        </button>
+
+        <!-- Deposit Form Modal -->
+        <div class="modal hidden" id="depositModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">💰 Пополнение баланса</span>
+                    <span class="modal-close" onclick="hideDepositForm()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="deposit-form">
+                        <div class="form-group">
+                            <label for="depositAmount">Сумма пополнения (UAH):</label>
+                            <input type="number" id="depositAmount" placeholder="Введите сумму" min="1" max="10000" step="1">
+                        </div>
+                        <div class="quick-deposit-amounts">
+                            <button class="quick-amount-btn" onclick="setDepositAmount(100)">100</button>
+                            <button class="quick-amount-btn" onclick="setDepositAmount(500)">500</button>
+                            <button class="quick-amount-btn" onclick="setDepositAmount(1000)">1000</button>
+                            <button class="quick-amount-btn" onclick="setDepositAmount(5000)">5000</button>
+                        </div>
+                        <div class="deposit-info">
+                            <p>💡 Лимиты пополнения:</p>
+                            <ul>
+                                <li>Минимум: 1 UAH</li>
+                                <li>Максимум за раз: 10,000 UAH</li>
+                                <li>Максимальный баланс: 500,000 UAH</li>
+                            </ul>
+                        </div>
+                        <button class="deposit-submit-btn" onclick="depositBalance()">💳 Пополнить баланс</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        // App state
+        let selectedTeam = null;
+        let selectedCurrency = null;
+        let selectedCoef = null;
+        let selectedRate = null;
+        let userBalance = 0;
+
+        // Dynamic settings - will be loaded from API
+        let gameSettings = {
+            teams: {},
+            coefficients: {},
+            exchange_rates: {},
+            limits: {}
+        };
+
+        // Quick amounts for different currencies
+        const quickAmounts = {
+            'UAH': ['10', '50', '100', '500'],
+            'USD': ['0.5', '1', '5', '10'],
+            'EUR': ['0.5', '1', '5', '10'],
+            'BTC': ['0.001', '0.01', '0.1', '1'],
+            'ETH': ['0.01', '0.1', '1', '10']
+        };
+
+        // DOM elements
+        const balanceEl = document.getElementById('balance');
+        const betAmountInput = document.getElementById('betAmount');
+        const quickAmountsEl = document.getElementById('quickAmounts');
+        const betSummary = document.getElementById('betSummary');
+        const placeBetBtn = document.getElementById('placeBetBtn');
+
+        // Initialize app
+        function init() {
+            loadGameSettings();
+            loadUserData();
+            updateUI();
+        }
+        
+        function loadGameSettings() {
+            fetch('/api/settings')
+            .then(response => response.json())
+            .then(settings => {
+                console.log('Loaded settings:', settings);
+                gameSettings = settings;
+                createTeamCards();
+                createCurrencyButtons();
+                setupEventListeners();
+            })
+            .catch(error => {
+                console.error('Error loading settings:', error);
+                // Fallback to default settings
+                gameSettings = {
+                    teams: {team1: 'Sovkamax', team2: 'Faze'},
+                    coefficients: {'Sovkamax': 1.82, 'Faze': 2.22},
+                    team_emojis: {'Sovkamax': '🧑‍💼', 'Faze': '🦅'},
+                    exchange_rates: {'UAH': 1, 'USD': 41.50, 'EUR': 45.20, 'BTC': 2450000, 'ETH': 145000}
+                };
+                createTeamCards();
+                createCurrencyButtons();
+                setupEventListeners();
+            });
+        }
+        
+        function createTeamCards() {
+            const teamsGrid = document.getElementById('teamsGrid');
+            const team1 = gameSettings.teams.team1;
+            const team2 = gameSettings.teams.team2;
+            const coef1 = gameSettings.coefficients[team1];
+            const coef2 = gameSettings.coefficients[team2];
+            const emoji1 = gameSettings.team_emojis?.[team1] || gameSettings.team_emojis?.team1 || '🧑‍💼';
+            const emoji2 = gameSettings.team_emojis?.[team2] || gameSettings.team_emojis?.team2 || '🦅';
+            
+            teamsGrid.innerHTML = `
+                <div class="team-card" data-team="${team1}" data-coef="${coef1}">
+                    <div class="team-icon">${emoji1}</div>
+                    <div class="team-name">${team1}</div>
+                    <div class="team-coef">${coef1}</div>
+                </div>
+                <div class="team-card" data-team="${team2}" data-coef="${coef2}">
+                    <div class="team-icon">${emoji2}</div>
+                    <div class="team-name">${team2}</div>
+                    <div class="team-coef">${coef2}</div>
+                </div>
+            `;
+        }
+        
+        function createCurrencyButtons() {
+            const currencyGrid = document.getElementById('currencyGrid');
+            const rates = gameSettings.exchange_rates;
+            const currencyIcons = {
+                'UAH': '💸',
+                'USD': '💵', 
+                'EUR': '💶',
+                'BTC': '₿',
+                'ETH': '⟠'
+            };
+            
+            currencyGrid.innerHTML = '';
+            for (const [currency, rate] of Object.entries(rates)) {
+                const icon = currencyIcons[currency] || '💰';
+                currencyGrid.innerHTML += `
+                    <div class="currency-btn" data-currency="${currency}" data-rate="${rate}">
+                        <div class="currency-icon">${icon}</div>
+                        <div class="currency-name">${currency}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function loadUserData() {
+            // Get user data from Telegram or use demo user for testing
+            const user = tg.initDataUnsafe?.user;
+            let userId;
+            
+            console.log('Telegram WebApp object:', tg);
+            console.log('InitData:', tg.initDataUnsafe);
+            console.log('User object:', user);
+            console.log('Full tg object properties:', Object.keys(tg));
+            
+            // Try multiple ways to get user ID
+            if (user && user.id) {
+                userId = user.id.toString();
+                console.log('Telegram user detected from initDataUnsafe:', user);
+            } else if (tg.initData && tg.initData.includes('user=')) {
+                // Try to parse from initData string
+                try {
+                    const urlParams = new URLSearchParams(tg.initData);
+                    const userStr = urlParams.get('user');
+                    if (userStr) {
+                        const userObj = JSON.parse(decodeURIComponent(userStr));
+                        userId = userObj.id.toString();
+                        console.log('Telegram user detected from initData string:', userObj);
+                    }
+                } catch (e) {
+                    console.log('Failed to parse user from initData:', e);
+                }
+            }
+            
+            // Last fallback - check if we're in actual Telegram environment
+            if (!userId) {
+                // Check if we're really in Telegram by looking for platform info
+                if (tg.platform && tg.platform !== 'unknown') {
+                    console.log('In Telegram environment but no user ID, this might be a testing scenario');
+                    userId = 'demo_user';
+                } else {
+                    userId = 'demo_user';
+                    console.log('Demo mode - no Telegram user found, using demo_user');
+                }
+            }
+            
+            console.log('Using userId:', userId);
+            
+            // Store globally for other functions
+            window.currentUserId = userId;
+            
+            // Send user data to backend to get balance
+            fetchUserBalance(userId);
+        }
+
+        function fetchUserBalance(userId) {
+            fetch('/api/balance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                userBalance = data.balance || 0;
+                balanceEl.textContent = userBalance.toFixed(2);
+            })
+            .catch(error => {
+                console.error('Error fetching balance:', error);
+            });
+        }
+
+        function setupEventListeners() {
+            // Team selection (using event delegation for dynamic elements)
+            document.getElementById('teamsGrid').addEventListener('click', (e) => {
+                const card = e.target.closest('.team-card');
+                if (card) {
+                    document.querySelectorAll('.team-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    selectedTeam = card.dataset.team;
+                    selectedCoef = parseFloat(card.dataset.coef);
+                    updateSummary();
+                    updatePlaceBetButton();
+                }
+            });
+
+            // Currency selection (using event delegation for dynamic elements)
+            document.getElementById('currencyGrid').addEventListener('click', (e) => {
+                const btn = e.target.closest('.currency-btn');
+                if (btn) {
+                    document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedCurrency = btn.dataset.currency;
+                    selectedRate = parseFloat(btn.dataset.rate);
+                    updateQuickAmounts();
+                    updateSummary();
+                    updatePlaceBetButton();
+                }
+            });
+
+            // Bet amount input
+            betAmountInput.addEventListener('input', () => {
+                updateSummary();
+                updatePlaceBetButton();
+            });
+
+            // Place bet button
+            placeBetBtn.addEventListener('click', placeBet);
+        }
+
+        function updateQuickAmounts() {
+            if (!selectedCurrency) return;
+            
+            const amounts = quickAmounts[selectedCurrency] || [];
+            quickAmountsEl.innerHTML = '';
+            
+            amounts.forEach(amount => {
+                const btn = document.createElement('div');
+                btn.className = 'quick-amount';
+                btn.textContent = amount;
+                btn.addEventListener('click', () => {
+                    betAmountInput.value = amount;
+                    updateSummary();
+                    updatePlaceBetButton();
+                });
+                quickAmountsEl.appendChild(btn);
+            });
+        }
+
+        function updateSummary() {
+            const amount = parseFloat(betAmountInput.value) || 0;
+            
+            if (selectedTeam && selectedCurrency && amount > 0) {
+                document.getElementById('summaryTeam').textContent = selectedTeam;
+                document.getElementById('summaryAmount').textContent = `${amount} ${selectedCurrency}`;
+                document.getElementById('summaryCoef').textContent = selectedCoef;
+                
+                const potentialWin = amount * selectedCoef;
+                document.getElementById('summaryWin').textContent = `${potentialWin.toFixed(2)} ${selectedCurrency}`;
+                
+                betSummary.classList.remove('hidden');
+            } else {
+                betSummary.classList.add('hidden');
+            }
+        }
+
+        function updatePlaceBetButton() {
+            const amount = parseFloat(betAmountInput.value) || 0;
+            const amountInUAH = amount * (selectedRate || 1);
+            
+            const maxBalanceLimit = gameSettings.limits?.max_balance_uah || 500000;
+            const canBet = selectedTeam && selectedCurrency && amount > 0 && 
+                          (userBalance + amountInUAH) <= maxBalanceLimit;
+            
+            placeBetBtn.disabled = !canBet;
+            
+            if (amount > 0 && (userBalance + amountInUAH) > maxBalanceLimit) {
+                showNotification(`Превышен лимит пополнения ${maxBalanceLimit.toLocaleString()} UAH`, 'error');
+            }
+        }
+
+        function placeBet() {
+            const amount = parseFloat(betAmountInput.value);
+            
+            // Use the globally stored userId
+            const userId = window.currentUserId || 'demo_user';
+            console.log('Placing bet for userId:', userId);
+            
+            const betData = {
+                user_id: userId,
+                team: selectedTeam,
+                currency: selectedCurrency,
+                amount: amount,
+                coef: selectedCoef
+            };
+            
+            placeBetBtn.disabled = true;
+            placeBetBtn.textContent = 'Обработка...';
+            
+            fetch('/api/place_bet', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(betData)
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success === true) {
+                    showNotification('Ставка принята!');
+                    userBalance = data.new_balance;
+                    balanceEl.textContent = userBalance.toFixed(2);
+                    resetForm();
+                    hasCheckedResult = false; // Reset for new bet
+                    // Don't close immediately, let user see the success
+                    setTimeout(() => tg.close(), 2000);
+                } else {
+                    showNotification(data.error || 'Ошибка при размещении ставки', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error placing bet:', error);
+                showNotification('Ошибка сети: ' + error.message, 'error');
+            })
+            .finally(() => {
+                placeBetBtn.disabled = false;
+                placeBetBtn.textContent = '🎯 СДЕЛАТЬ СТАВКУ';
+            });
+        }
+
+        function resetForm() {
+            teamCards.forEach(c => c.classList.remove('selected'));
+            currencyBtns.forEach(b => b.classList.remove('selected'));
+            betAmountInput.value = '';
+            betSummary.classList.add('hidden');
+            selectedTeam = null;
+            selectedCurrency = null;
+            selectedCoef = null;
+            selectedRate = null;
+            updatePlaceBetButton();
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function updateUI() {
+            // Apply Telegram theme
+            if (tg.themeParams) {
+                document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color);
+                document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color);
+                document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color);
+                document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.themeParams.secondary_bg_color);
+            }
+        }
+
+        function createConfetti() {
+            const container = document.createElement('div');
+            container.className = 'confetti-container';
+            document.body.appendChild(container);
+
+            const colors = ['#4CAF50', '#66BB6A', '#81C784', '#A5D6A7', '#C8E6C9'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                container.appendChild(confetti);
+            }
+
+            setTimeout(() => {
+                container.remove();
+            }, 5000);
+        }
+
+        function showWinMessage(winnings, team) {
+            createConfetti();
+            
+            const message = document.createElement('div');
+            message.className = 'win-message';
+            message.innerHTML = `
+                <div style="font-size: 32px; margin-bottom: 10px;">🎉</div>
+                <div>ПОЗДРАВЛЯЕМ!</div>
+                <div style="font-size: 18px; margin-top: 10px;">Команда ${team} победила!</div>
+                <div style="font-size: 20px; margin-top: 15px; color: #FFD700;">+${winnings.toFixed(2)} UAH</div>
+            `;
+            document.body.appendChild(message);
+
+            setTimeout(() => {
+                message.remove();
+            }, 4000);
+        }
+
+        function showLoseMessage(lost, team) {
+            const message = document.createElement('div');
+            message.className = 'lose-message';
+            message.innerHTML = `
+                <div style="font-size: 32px; margin-bottom: 10px;">😔</div>
+                <div>К сожалению, вы проиграли</div>
+                <div style="font-size: 16px; margin-top: 10px;">Команда ${team} проиграла</div>
+                <div style="font-size: 18px; margin-top: 15px;">-${lost.toFixed(2)} UAH</div>
+            `;
+            document.body.appendChild(message);
+
+            setTimeout(() => {
+                message.remove();
+            }, 4000);
+        }
+
+        // Add result checking API
+        window.checkResult = function() {
+            const user_id = window.currentUserId || 'demo_user';
+            console.log('Auto result check:', {user_id});
+            
+            fetch('/api/check_result', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({user_id: user_id})
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Result check response:', data);
+                
+                if (data.result === 'win') {
+                    showWinMessage(data.winnings, data.user_team);
+                    // Update balance
+                    userBalance = data.balance;
+                    balanceEl.textContent = userBalance.toFixed(2);
+                } else if (data.result === 'lose') {
+                    showLoseMessage(data.lost, data.user_team);
+                    // Update balance
+                    userBalance = data.balance;
+                    balanceEl.textContent = userBalance.toFixed(2);
+                } else if (data.result === 'no_bet') {
+                    console.log('User has no bet');
+                } else {
+                    console.log('Match still pending');
+                }
+            })
+            .catch(error => {
+                console.error('Error checking result:', error);
+            });
+        };
+
+        // Auto-check for results every 10 seconds if user has placed a bet
+        let resultCheckInterval = null;
+        let hasCheckedResult = false;
+
+        function startResultChecking() {
+            if (resultCheckInterval) return;
+            
+            resultCheckInterval = setInterval(() => {
+                const user_id = tg.initDataUnsafe?.user?.id || 'demo_user';
+                
+                fetch('/api/check_result', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({user_id: user_id})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Auto result check:', data);
+                    if (data.result === 'win' && !hasCheckedResult) {
+                        hasCheckedResult = true;
+                        showWinMessage(data.winnings, data.user_team);
+                        userBalance = data.balance;
+                        balanceEl.textContent = userBalance.toFixed(2);
+                        stopResultChecking();
+                    } else if (data.result === 'lose' && !hasCheckedResult) {
+                        hasCheckedResult = true;
+                        showLoseMessage(data.lost, data.user_team);
+                        userBalance = data.balance;
+                        balanceEl.textContent = userBalance.toFixed(2);
+                        stopResultChecking();
+                    } else if (data.result === 'no_bet') {
+                        // User has no bet, can reset result checking
+                        hasCheckedResult = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Auto result check error:', error);
+                });
+            }, 10000); // Check every 10 seconds
+        }
+
+        function stopResultChecking() {
+            if (resultCheckInterval) {
+                clearInterval(resultCheckInterval);
+                resultCheckInterval = null;
+            }
+        }
+
+        // Deposit functionality
+        function showDepositForm() {
+            document.getElementById('depositModal').classList.remove('hidden');
+        }
+
+        function hideDepositForm() {
+            document.getElementById('depositModal').classList.add('hidden');
+            document.getElementById('depositAmount').value = '';
+        }
+
+        function setDepositAmount(amount) {
+            document.getElementById('depositAmount').value = amount;
+        }
+
+        function depositBalance() {
+            const depositAmount = parseFloat(document.getElementById('depositAmount').value);
+            
+            if (!depositAmount || depositAmount <= 0) {
+                alert('Введите корректную сумму для пополнения');
+                return;
+            }
+            
+            if (depositAmount > 10000) {
+                alert('Максимальная сумма пополнения: 10,000 UAH');
+                return;
+            }
+            
+            // Use the globally stored userId
+            const userId = window.currentUserId || 'demo_user';
+            console.log('Depositing for userId:', userId);
+            
+            // Disable button during request
+            const depositBtn = document.querySelector('.deposit-submit-btn');
+            depositBtn.disabled = true;
+            depositBtn.textContent = '⏳ Пополняем...';
+            
+            fetch('/api/deposit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    amount: depositAmount
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update balance
+                    userBalance = data.new_balance;
+                    balanceEl.textContent = userBalance.toFixed(2);
+                    
+                    // Show success message
+                    alert(`✅ ${data.message}\nНовый баланс: ${userBalance.toFixed(2)} UAH`);
+                    
+                    // Close modal
+                    hideDepositForm();
+                } else {
+                    alert(`❌ Ошибка: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error depositing balance:', error);
+                alert('❌ Ошибка при пополнении баланса');
+            })
+            .finally(() => {
+                // Re-enable button
+                depositBtn.disabled = false;
+                depositBtn.textContent = '💳 Пополнить баланс';
+            });
+        }
+
+        // Close modal on background click
+        document.getElementById('depositModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideDepositForm();
+            }
+        });
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            startResultChecking(); // Start checking for results
+        });
+    </script>
+</body>
+</html>

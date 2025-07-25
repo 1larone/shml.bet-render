@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: cs2-betting-bot
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main_universal.py
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: HOST_URL
+        value: cs2-betting-bot.onrender.com
+      - key: PORT
+        value: 5000
+    autoDeploy: false
